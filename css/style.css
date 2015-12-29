@@ -1,0 +1,7 @@
+.movieList{
+    width: 200px;
+    height: 200px;
+    border: black 2px solid;
+    display: inline-table;
+    margin: 10px 10px;
+}
