@@ -2,46 +2,52 @@
  * Created by TOTO on 12/9/15.
  */
 var fs = require('fs');
-var database = require('./database');
 var qs = require('querystring');
+var database = require('./database');
 var temper = require('./temper');
 
-function loadCSS(req, res){
-  if(req.url.indexOf('.css') != -1){ //req.url has the pathname, check if it conatins '.css'
-    fs.readFile('../css/style.css', function (err, data) {
-      if (err) console.log(err);
-      res.writeHead(200, {'Content-Type': 'text/css'});
-      res.write(data);
-      res.end();
-    });
-  }
-}
-
 function index(request, response){
-  console.log('Request index had been received!');
+  //Get all the movies from database and render each of them(via temper.renderHTML) into index page
   function printAllMoviesOnHTML(movies) {
     temper.renderHTML('../index.html',response, movies, temper.iterateMoviesOnPage);
   }
   database.showAllMovies(printAllMoviesOnHTML);
 }
 
+function loadCSS(req, res){
+    fs.readFile('../css/style.css', function (err, data) {
+      if (err) {
+        console.log(err);
+      }else{
+        res.writeHead(200, {'Content-Type': 'text/css'});
+        res.write(data);
+        res.end();
+      }
+    });
+}
+
 function showAddPage(request, response){
-  console.log('Request add had been received!');
+  //Show add movie page
   temper.showEmptyHTML('../add.html', response);
 }
 
 function addMovie(request, response){
+  //Post request to add movie to database
   var POST = '';
   request.on('data',function(data) {
+    //Take all the request data into a long string
     POST += data;
   });
   request.on('end', function(){
     if (POST.length > 1e6) {
+      //If the request is extremely long then stop
       // FLOOD ATTACK OR FAULTY CLIENT, NUKE REQUEST
       request.connection.destroy();
     }else{
       POST = qs.parse(POST);
-      database.addMovieToDB(POST.movie, POST.director, POST.description, request, response, index)
+      //make post into object so could be read
+      database.addMovieToDB(POST.movie, POST.director, POST.description, response);
+      //Give it response so it could be redirected back to index page
     }
   });
 }

@@ -8,7 +8,7 @@ function route(handle, pathname, request, response, method, id){
   }else{
     console.log("Can't find the url path");
     response.writeHead(404, {'Content-Type': 'text/plain'});
-    response.write('Can not fine the url: ' + pathname);
+    response.write('Can not fine the url: ' + pathname + ' method as: ' + method);
     response.end();
   }
 }
